@@ -1,9 +1,8 @@
 "use client";
 import Button from "@/components/buttons/Button";
-import { AddIcon, CheckIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Checkbox,
-  Container,
   HStack,
   Input,
   ListItem,
@@ -70,7 +69,7 @@ export default function Checklist() {
   };
 
   useEffect(() => {
-    document.title = title;
+    document.title = title === "" ? "Untitled checklist" : title
   }, [title]);
 
   return (
