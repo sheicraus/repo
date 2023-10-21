@@ -1,5 +1,6 @@
 "use client";
 import Button from "@/components/buttons/Button";
+import CheckListMore from "@/components/modals/CheckListMore";
 import { AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Checkbox,
@@ -9,6 +10,8 @@ import {
   Tooltip,
   UnorderedList,
 } from "@chakra-ui/react";
+import { faEllipsisVertical, faListCheck } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ChangeEvent, useEffect, useState } from "react";
 
 interface ChecklistItem {
@@ -75,16 +78,16 @@ export default function Checklist() {
   return (
     <div className="min-h-screen w-screen bg-primaryBg">
       <div className="p-3 bg-secondary-50 text-white flex flex-row items-center justify-center">
-        <EditIcon fontSize={24} className="mr-4" />
+        <FontAwesomeIcon className="px-2" icon={faListCheck} />
         <Input
-          className="font-bold text-2xl line-clamp-1"
+          className="font-bold text-2xl line-clamp-1 px-2 py-1"
           variant="unstyled"
           size="lg"
           placeholder="Checklist title..."
           value={title}
           onChange={handleTitleChange}
         />
-        
+        <CheckListMore/>
       </div>
       <HStack className="flex flex-row justify-center align-middle p-2">
         <Input
