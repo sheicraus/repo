@@ -1,6 +1,6 @@
 "use client";
-import Button from "@/components/buttons/Button";
-import CheckListMore from "@/components/modals/CheckListMore";
+import Button from "@/app/components/buttons/Button";
+import CheckListMore from "@/app/components/modals/CheckListMore";
 import { AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
   Checkbox,
@@ -13,7 +13,10 @@ import {
 import { faEllipsisVertical, faListCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ChangeEvent, useEffect, useState } from "react";
-
+// import getAllChecklist from "../../api/getAllChecklist";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { Database } from '@/database.types'
+import { useParams } from "next/navigation";
 interface ChecklistItem {
   text: string;
   checked: boolean;
@@ -21,10 +24,22 @@ interface ChecklistItem {
   checkedOn: Date | null;
 }
 
-export default function Checklist() {
+export default async function Checklist() {
+  const params = useParams();
+  console.log(params.id) // get checklist id
   const [title, setTitle] = useState("Untitled checklist");
   const [checklists, setChecklists] = useState<ChecklistItem[]>([]);
   const [newItem, setNewItem] = useState<string>("");
+  const supabase = createClientComponentClient<Database>();
+  useEffect(() => {
+    const getData = async () => {
+      const { data, error } = await supabase.from('checklists').select()
+      console.log('data', data)
+      console.log('err', error)
+    }
+
+    getData()
+  }, [])
 
   const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
@@ -75,6 +90,8 @@ export default function Checklist() {
     document.title = title === "" ? "Untitled checklist" : title
   }, [title]);
 
+  
+
   return (
     <div className="min-h-screen w-screen bg-primaryBg">
       <div className="p-3 bg-secondary-50 text-white flex flex-row items-center justify-center">
@@ -84,6 +101,7 @@ export default function Checklist() {
           variant="unstyled"
           size="lg"
           placeholder="Checklist title..."
+          // placeholder="Checklist title..."
           value={title}
           onChange={handleTitleChange}
         />

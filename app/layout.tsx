@@ -7,7 +7,7 @@ const quickSand = Quicksand({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'repo',
-  description: 'Create, collaborate, and share checklists to anyone',
+  description: 'Create, collaborate, and share checklists to anyone.',
 }
 
 export default function RootLayout({
