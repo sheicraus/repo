@@ -1,26 +1,20 @@
 "use client";
 import React, { ChangeEvent, useState } from "react";
 import Button from "./buttons/Button";
-import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import {
   Container,
   Input,
-  InputGroup,
-  InputRightElement,
   useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { supabase } from "../service/supabase";
-// import { createCheckList } from "../api/ChecklistApi";
 
 export default function CreateListButton() {
   const toast = useToast();
+  const router = useRouter();
   const [title, setTitle] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
- 
-  const router = useRouter();
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
