@@ -4,7 +4,6 @@ import Button from '@/app/components/buttons/Button';
 import { HStack, Input, useToast } from '@chakra-ui/react'
 import { faAdd } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { revalidateTag } from 'next/cache';
 import React, { ChangeEvent, useState } from 'react'
 
 interface AddItemProps {
@@ -27,42 +26,11 @@ export default function AddItem({checklistId} : AddItemProps) {
 
   const handleAddItem = async () => {
     setIsLoading(true);
-
+    setNewItem("") // reset field
     const res = await addItem(checklistId, newItem);
-
-    if (res.data) {
-      console.log(res.data)
-    } else if (res.error) {
-      console.log(res.error)
-
-    }
-    
-
     setIsLoading(false);
   }
 
-  // const handleAddItem = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await fetch('/api/checklistItem', {
-  //       method: 'POST',
-  //       body: JSON.stringify({ checklistId, content: newItem }),
-  //     });
-
-  //     const result = await response.json();
-
-  //     revalidateTag("checklist")
-
-  //     if (result.data) {
-  //       console.log('added new item', result.data)
-  //     } else {
-  //       console.log('error adding new item', result.error)
-  //     } 
-  //   } catch (error) {
-  //     console.error('An error occurred:', error);
-  //   }
-  //   setIsLoading(false);
-  // }
   return (
     <HStack className="flex flex-row justify-center align-middle p-2">
         <Input

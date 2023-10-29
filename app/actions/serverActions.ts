@@ -51,11 +51,9 @@ export async function addItem(checklistId: string, content: string) {
       ])
       .select();
 
-    // revalidateTag("checklist");
     revalidatePath('/checklist/[id]', 'page')
 
-    return {data}
-    
+    return {data} 
   } catch (error) {
     return {error}
   }
