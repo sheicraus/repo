@@ -16,6 +16,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -24,74 +25,78 @@ import { useRouter, usePathname } from "next/navigation";
 // import { useRouter as useRouterNavigation } from "next/router";
 
 interface CheckListMoreProps {
-  checklistId: string
+  checklistId: string;
 }
 
-export default function CheckListMore({checklistId}: CheckListMoreProps) {
+export default function CheckListMore({ checklistId }: CheckListMoreProps) {
   const toast = useToast();
   const router = useRouter();
-  const pathname = usePathname()
-  const [shortUrl, setShortUrl] = useState<string>("");  
+  const pathname = usePathname();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [shortUrl, setShortUrl] = useState<string>("");
 
   const handleGenerateShortUrl = async () => {
+    setIsLoading(true);
     onOpen();
-    const res = await generateShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`);
-    console.log('short url', res)
+    const res = await generateShortUrl(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`
+    );
 
     if (res.data) {
-      setShortUrl(res.data.data.shortUrl)
+      setShortUrl(res.data.data.shortUrl);
     } else {
       // Set the long url when api failed
-      setShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`)
+      setShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`);
     }
-  }
+    setIsLoading(false);
+  };
 
   const handleDeleteChecklist = async () => {
     const res = await deleteChecklist(checklistId);
-    console.log('after delete checklist', res)
+    console.log("after delete checklist", res);
     if (res.data) {
       toast({
         title: "Successfully deleted checklist!",
-        status: 'success',
+        status: "success",
         duration: 2000,
         isClosable: true,
-        position: 'top',
-      })
+        position: "top",
+      });
       setTimeout(() => {
-        router.push('/');
-      }, 1000)
+        router.push("/");
+      }, 1000);
     } else {
       toast({
         title: "Failed to delete checklist!",
-        status: 'error',
+        status: "error",
         duration: 2000,
         isClosable: true,
-        position: 'top',
-      })
+        position: "top",
+      });
     }
-  }
+  };
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shortUrl);
       toast({
         title: "Copied!",
-        status: 'success',
+        status: "success",
         duration: 800,
         isClosable: true,
-        position: 'top',
-      })
+        position: "top",
+      });
     } catch (err) {
       toast({
         title: "Copy to clipboard failed.",
-        status: 'error',
+        status: "error",
         duration: 1000,
         isClosable: true,
-        position: 'top',
-      })
+        position: "top",
+      });
     }
-};
+  };
 
   return (
     <div>
@@ -110,15 +115,21 @@ export default function CheckListMore({checklistId}: CheckListMoreProps) {
           <ModalCloseButton />
           <ModalBody className="mb-3">
             <p>Share to collaborate! 🔥</p>
-            <Box className="flex items-center rounded-md bg-slate-50 p-1">
-              <p className="text-gray-500 w-full px-2 text-sm">{shortUrl}</p>
-              <Button  primary onClick={handleCopy}>
-                <FontAwesomeIcon icon={faCopy} className="mr-1" />
-                Copy
-              </Button>
-            </Box>
+            {isLoading ? (
+              <Box className="flex items-center justify-center rounded-md bg-slate-50 p-3">
+                <Spinner color="gray" />
+              </Box>
+            ) : (
+              <Box className="flex items-center rounded-md bg-slate-50 p-1">
+                <p className="text-gray-500 w-full px-2 text-sm">{shortUrl}</p>
+                <Button primary onClick={handleCopy}>
+                  <FontAwesomeIcon icon={faCopy} className="mr-1" />
+                  Copy
+                </Button>
+              </Box>
+            )}
             <p className="mt-4">Or save some space</p>
-            <Button 
+            <Button
               className="col-span-full text-red-600 bg-red-100 w-full mx-0"
               onClick={handleDeleteChecklist}
             >
