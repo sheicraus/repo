@@ -1,167 +1,43 @@
-"use client";
-import Button from "@/app/components/buttons/Button";
-import CheckListMore from "@/app/components/modals/CheckListMore";
-import { AddIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import {
-  Checkbox,
-  HStack,
-  Input,
-  ListItem,
-  Tooltip,
-  UnorderedList,
-} from "@chakra-ui/react";
-import { faEllipsisVertical, faListCheck } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { ChangeEvent, useEffect, useState } from "react";
-// import getAllChecklist from "../../api/getAllChecklist";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import type { Database } from '@/database.types'
-import { useParams } from "next/navigation";
-interface ChecklistItem {
-  text: string;
-  checked: boolean;
-  createdAt: Date;
-  checkedOn: Date | null;
-}
+import CheckListMore from '@/app/components/modals/CheckListMore';
+import React from 'react'
+import CheckListItems from './CheckListItems';
+import AddItem from './AddItem';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSadCry, faSadTear } from '@fortawesome/free-solid-svg-icons';
 
-export default async function Checklist() {
-  const params = useParams();
-  console.log(params.id) // get checklist id
-  const [title, setTitle] = useState("Untitled checklist");
-  const [checklists, setChecklists] = useState<ChecklistItem[]>([]);
-  const [newItem, setNewItem] = useState<string>("");
-  const supabase = createClientComponentClient<Database>();
-  useEffect(() => {
-    const getData = async () => {
-      const { data, error } = await supabase.from('checklists').select()
-      console.log('data', data)
-      console.log('err', error)
+export default async function Checklist({ params: { id } }: { params: { id: string } }) {
+  // const id = `4627fe26-d9b1-4cee-a3f5-2e031197dc77`;
+  const response = await fetch(`http://localhost:3000/api/checklist/${id}`, {
+    method: 'GET',
+    cache: 'no-cache',
+    next: {
+      tags: ["checklist"]
     }
+  });
 
-    getData()
-  }, [])
+  const result = await response.json();
+  // // console.log(response)
+  console.log(result)
 
-  const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
-  };
-
-  const handleItemChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setNewItem(event.target.value);
-  };
-
-  const handleAddItem = () => {
-    if (newItem.trim() !== "") {
-      setChecklists([
-        ...checklists,
-        {
-          text: newItem,
-          checked: false,
-          createdAt: new Date(),
-          checkedOn: null,
-        },
-      ]);
-      setNewItem("");
-    }
-  };
-
-  const handleDeleteItem = (index: number) => {
-    const updatedChecklists = [...checklists];
-    updatedChecklists.splice(index, 1);
-    setChecklists(updatedChecklists);
-  };
-
-  const handleToggleCheck = (index: number) => {
-    const updatedChecklists = [...checklists];
-    updatedChecklists[index].checked = !updatedChecklists[index].checked;
-    updatedChecklists[index].checkedOn = updatedChecklists[index].checked
-      ? new Date()
-      : null;
-    setChecklists(updatedChecklists);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddItem();
-    }
-  };
-
-  useEffect(() => {
-    document.title = title === "" ? "Untitled checklist" : title
-  }, [title]);
-
-  
-
-  return (
-    <div className="min-h-screen w-screen bg-primaryBg">
-      <div className="p-3 bg-secondary-50 text-white flex flex-row items-center justify-center">
-        <FontAwesomeIcon className="px-2" icon={faListCheck} />
-        <Input
-          className="font-bold text-2xl line-clamp-1 px-2 py-1"
-          variant="unstyled"
-          size="lg"
-          placeholder="Checklist title..."
-          // placeholder="Checklist title..."
-          value={title}
-          onChange={handleTitleChange}
-        />
-        <CheckListMore/>
+  if (result.data){
+    return (
+      <div className="min-h-screen w-screen bg-primaryBg">
+        <div className="px-3 bg-secondary-50 text-white flex flex-row items-center justify-between">
+          <div className='col-span-8'>
+            <h1 className="font-bold text-2xl line-clamp-1 px-2 py-1">{result.data[0].title}</h1>
+          </div>
+          <CheckListMore/>
+        </div>
+        <AddItem checklistId={id}/>
+        <CheckListItems items={result.data[0].checklist_items} />
       </div>
-      <HStack className="flex flex-row justify-center align-middle p-2">
-        <Input
-          className="border-secondary-50 rounded-lg"
-          placeholder="What to do..."
-          value={newItem}
-          onChange={handleItemChange}
-          onKeyDown={handleKeyDown}
-          _focus={{borderColor: "#4D7B93", borderInlineColor: "#4D7B93"}}
-        />
-        <Button primary onClick={handleAddItem}>
-          <span className="pr-2">
-            <AddIcon fontSize={12} />
-          </span>
-          Add
-        </Button>
-      </HStack>
-      <UnorderedList styleType="none" className="mt-3">
-        {checklists.map((item, index) => (
-          <ListItem
-            key={index}
-            className="mr-4 p-2 px-3 rounded-md flex flex-row m-1 bg-slate-300"
-          >
-              <Checkbox
-                className="align-top col-span-10 w-full"
-                checked={item.checked}
-                onChange={() => handleToggleCheck(index)}
-                ringColor="gray.900"
-              >
-                <div
-                  className={`ml-2 flex-wrap ${
-                    item.checked ? "line-through" : "first-letter:"
-                  }`}
-                >
-                  {item.text}
-                </div>
-                <div className="ml-2">
-                  {item.checkedOn && (
-                    <small className="text-slate-500 text-xs">
-                      Completed on: {item.checkedOn?.toLocaleString()}
-                    </small>
-                  )}
-                </div>
-              </Checkbox>
-              
-              <Tooltip label='Remove' className=" col-span-2 rounded-md" fontSize={10}>
-                <DeleteIcon
-                  className="text-gray-400 cursor-pointer mt-1"
-                  onClick={() => handleDeleteItem(index)}
-                  fontSize={12}
-                />
-              </Tooltip>
-            
-          </ListItem>
-        ))}
-      </UnorderedList>
-    </div>
-  );
+    )
+  } else {
+    return (
+      <div className="min-h-screen w-screen bg-primaryBg flex justify-center items-center">
+          <FontAwesomeIcon icon={faSadTear} width={32} height={32} />
+          Oops! Checklist not found.
+      </div>
+    )
+  }
 }
