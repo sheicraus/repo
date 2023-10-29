@@ -6,7 +6,7 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import Button from "../buttons/Button";
 import {
   Box,
@@ -31,14 +31,20 @@ export default function CheckListMore({checklistId}: CheckListMoreProps) {
   const toast = useToast();
   const router = useRouter();
   const pathname = usePathname()
-  
-  // const routerNavigation = useRouterNavigation();
+  const [shortUrl, setShortUrl] = useState<string>("");  
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleGenerateShortUrl = async () => {
     onOpen();
-    const res = await generateShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/checklist/${checklistId}`);
+    const res = await generateShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`);
     console.log('short url', res)
+
+    if (res.data) {
+      setShortUrl(res.data.data.shortUrl)
+    } else {
+      // Set the long url when api failed
+      setShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`)
+    }
   }
 
   const handleDeleteChecklist = async () => {
@@ -68,7 +74,7 @@ export default function CheckListMore({checklistId}: CheckListMoreProps) {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`sample`);
+      await navigator.clipboard.writeText(shortUrl);
       toast({
         title: "Copied!",
         status: 'success',
@@ -105,7 +111,7 @@ export default function CheckListMore({checklistId}: CheckListMoreProps) {
           <ModalBody className="mb-3">
             <p>Share to collaborate! 🔥</p>
             <Box className="flex items-center rounded-md bg-slate-50 p-1">
-              <p className="text-gray-500 w-full px-2 text-sm">{pathname}</p>
+              <p className="text-gray-500 w-full px-2 text-sm">{shortUrl}</p>
               <Button  primary onClick={handleCopy}>
                 <FontAwesomeIcon icon={faCopy} className="mr-1" />
                 Copy
