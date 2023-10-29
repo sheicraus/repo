@@ -17,7 +17,6 @@ export interface Database {
           created_at: string | null
           id: number
           is_completed: boolean | null
-          is_deleted: boolean | null
           updated_at: string | null
         }
         Insert: {
@@ -27,7 +26,6 @@ export interface Database {
           created_at?: string | null
           id?: number
           is_completed?: boolean | null
-          is_deleted?: boolean | null
           updated_at?: string | null
         }
         Update: {
@@ -37,7 +35,6 @@ export interface Database {
           created_at?: string | null
           id?: number
           is_completed?: boolean | null
-          is_deleted?: boolean | null
           updated_at?: string | null
         }
         Relationships: [
@@ -53,21 +50,18 @@ export interface Database {
         Row: {
           created_at: string | null
           id: string
-          is_deleted: boolean | null
           title: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
-          is_deleted?: boolean | null
           title?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
-          is_deleted?: boolean | null
           title?: string | null
           updated_at?: string | null
         }

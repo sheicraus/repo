@@ -12,7 +12,7 @@ export const getChecklist = async (id: string) => {
       .eq("id", id)
       .order('id', { foreignTable: 'checklist_items', ascending: false })
 
-    return { data };
+    return { data, error };
   } catch (error) {
     return { error };
   }
@@ -29,10 +29,8 @@ export const addChecklist = async (title: string) => {
       ])
       .select();
 
-    console.log("addChecklist data", data);
     return { data };
   } catch (error) {
-    console.log("addChecklist err", error);
     return { error };
   }
 };
@@ -61,13 +59,15 @@ export async function updateItem(item: ChecklistItem) {
   try {
     const { data, error } = await supabase
     .from('checklist_items')
-    .update(item)
+    .update({
+      ...item
+    })
     .eq('id', item.id)
     .select()
 
     revalidatePath('/checklist/[id]', 'page')
 
-    return {data} 
+    return {data, error} 
   } catch (error) {
     return {error}
   }
@@ -82,6 +82,19 @@ export async function deleteItem(itemId: string) {
 
     revalidatePath('/checklist/[id]', 'page')
   } catch (error) {
+   
+  }
+}
+export async function deleteChecklist(checklistId: string) {
+  try {
+    const { error } = await supabase
+    .from('checklists')
+    .delete()
+    .eq('id', checklistId)
+
+    return {data: "Deleted successfully!", error}
+  } catch (error) {
+    return {error: "Failed to delete checklist."}
    
   }
 }

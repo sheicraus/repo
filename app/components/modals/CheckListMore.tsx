@@ -19,14 +19,46 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
+import { deleteChecklist } from "@/app/actions/serverActions";
+import { useRouter } from "next/navigation";
 
-export default function CheckListMore() {
-  const toast = useToast()
+interface CheckListMoreProps {
+  checklistId: string
+}
+
+export default function CheckListMore({checklistId}: CheckListMoreProps) {
+  const toast = useToast();
+  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleDeleteChecklist = async () => {
+    const res = await deleteChecklist(checklistId);
+    console.log('after delete checklist', res)
+    if (res.data) {
+      toast({
+        title: "Successfully deleted checklist!",
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+        position: 'top',
+      })
+      setTimeout(() => {
+        router.push('/');
+      }, 1000)
+    } else {
+      toast({
+        title: "Failed to delete checklist!",
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+        position: 'top',
+      })
+    }
+  }
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText("copied");
+      await navigator.clipboard.writeText(`checklist/${checklistId}`);
       toast({
         title: "Copied!",
         status: 'success',
@@ -70,7 +102,10 @@ export default function CheckListMore() {
               </Button>
             </Box>
             <p className="mt-4">Or save some space</p>
-            <Button className="col-span-full text-red-600 bg-red-100 w-full mx-0">
+            <Button 
+              className="col-span-full text-red-600 bg-red-100 w-full mx-0"
+              onClick={handleDeleteChecklist}
+            >
               <FontAwesomeIcon icon={faTrash} className="mr-2 text-red-600" />
               Delete checklist
             </Button>
