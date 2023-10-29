@@ -1,9 +1,10 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import Button from "../buttons/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import {
+  Container,
   Input,
   useToast,
 } from "@chakra-ui/react";
@@ -15,13 +16,24 @@ export default function CreatelistForm() {
   const toast = useToast();
   const router = useRouter();
   const ref = useRef<HTMLFormElement>(null);
+  const [title, setTitle] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value);
+  };
 
-  const handleCreateChecklist = async (formData: FormData) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleCreateChecklist();
+    }
+  };
+
+  const handleCreateChecklist = async () => {
     setIsLoading(true);
-    ref.current?.reset(); // reset form
-    const res = await addChecklist(formData);
+    setTitle(""); // reset field
+    const res = await addChecklist(title);
     if (res.data) {
       console.log(res.data)
       toast({
@@ -45,23 +57,21 @@ export default function CreatelistForm() {
     setIsLoading(false);
   }
 
-  // useEffect(() => {
-  //   console.log('isloading?', isLoading)
-  // }, [isLoading])
-
-
   return (
-      <form action={handleCreateChecklist} className="flex flex-row items-center w-full">
+      <Container className="flex flex-row items-center w-full">
         <Input
           name="title"
           className="rounded-md border-2 border-slate-300 focus:border-primary-100 focus-visible:shadow-none focus-visible:border-primary-100 focus:border-2"
           placeholder="Checklist title..."
           disabled={isLoading}
+          value={title}
+          onChange={handleTitleChange}
+          onKeyDown={handleKeyDown}
         />
-        <Button type={"submit"} primary isLoading={isLoading}>
+        <Button primary onClick={handleCreateChecklist} isLoading={isLoading}>
           <FontAwesomeIcon className="mr-2" icon={faAdd} />
           {isLoading ? `Creating...` : `Create`}
         </Button>
-      </form>
+      </Container>
   );
 }

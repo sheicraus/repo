@@ -18,9 +18,7 @@ export const getChecklist = async (id: string) => {
   }
 };
 
-export const addChecklist = async (formData: FormData) => {
-  const title = formData.get("title");
-
+export const addChecklist = async (title: string) => {
   try {
     const { data, error } = await supabase
       .from("checklists")
