@@ -1,4 +1,4 @@
-import CreateListButton from "@/app/components/CreateListButton";
+import ChecklistForm from "@/app/components/checklist/ChecklistForm";
 
 /**
  * Landing page
@@ -10,7 +10,7 @@ export default function Home() {
         <h2 className="font-medium text-lg text-primaryText my-5">
           Create, collaborate, and share checklists to anyone
         </h2>
-        <CreateListButton/>
+        <ChecklistForm/>
     </main>
   );
 }

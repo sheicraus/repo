@@ -8,6 +8,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export default function Button({
+  type,
   className,
   primary,
   secondary,
@@ -27,8 +28,11 @@ export default function Button({
     ${secondary ? "#6C8999" : ""}
   `;
 
+  // console.log('isloading?', isLoading)
+
   return (
     <ChakraButton
+      type={type || "button"}
       className={`m-1 px-5 py-2 rounded-lg ${buttonClasses} ${className || ""}`}
       onClick={onClick}
       disabled={isLoading || disabled}

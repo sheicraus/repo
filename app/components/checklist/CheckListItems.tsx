@@ -19,7 +19,7 @@ interface CheckListItemsProps {
 }
 
 export default function CheckListItems({ items }: CheckListItemsProps) {
-  console.log('items', items)
+  // console.log('items', items)
   return (
     <UnorderedList styleType="none" className="mt-3">
     {items.map((item, index) => (
