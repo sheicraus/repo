@@ -1,5 +1,6 @@
 "use client"
 import { deleteItem, updateItem } from "@/app/actions/serverActions";
+import { formatDate } from "@/app/service/utils";
 import { CheckListItemsProps, ChecklistItem } from "@/app/types/types";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { Checkbox, ListItem, Tooltip, UnorderedList } from "@chakra-ui/react";
@@ -44,7 +45,7 @@ export default function CheckListItems({ items }: CheckListItemsProps) {
             <div className="ml-2">
               {item.completed_on && (
                 <small className="text-slate-500 text-xs">
-                  Completed on: {item.completed_on?.toLocaleString()}
+                  Completed on: {formatDate(item.completed_on?.toLocaleString())}
                 </small>
               )}
             </div>
