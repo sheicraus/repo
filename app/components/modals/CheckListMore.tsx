@@ -37,10 +37,8 @@ export default function CheckListMore({checklistId}: CheckListMoreProps) {
 
   const handleGenerateShortUrl = async () => {
     onOpen();
-    // const res = await generateShortUrl(`https://localhost:3000/checklist/${checklistId}`);
-    // console.log('orig url', `https://localhost:3000/checklist/${checklistId}`)
-    // console.log(`${process.env.NEXT_PUBLIC_TINI_TOKEN}`)
-    // console.log(res)
+    const res = await generateShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/checklist/${checklistId}`);
+    console.log('short url', res)
   }
 
   const handleDeleteChecklist = async () => {
