@@ -19,8 +19,9 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { deleteChecklist } from "@/app/actions/serverActions";
-import { useRouter } from "next/navigation";
+import { deleteChecklist, generateShortUrl } from "@/app/actions/serverActions";
+import { useRouter, usePathname } from "next/navigation";
+// import { useRouter as useRouterNavigation } from "next/router";
 
 interface CheckListMoreProps {
   checklistId: string
@@ -29,7 +30,18 @@ interface CheckListMoreProps {
 export default function CheckListMore({checklistId}: CheckListMoreProps) {
   const toast = useToast();
   const router = useRouter();
+  const pathname = usePathname()
+  
+  // const routerNavigation = useRouterNavigation();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleGenerateShortUrl = async () => {
+    onOpen();
+    // const res = await generateShortUrl(`https://localhost:3000/checklist/${checklistId}`);
+    // console.log('orig url', `https://localhost:3000/checklist/${checklistId}`)
+    // console.log(`${process.env.NEXT_PUBLIC_TINI_TOKEN}`)
+    // console.log(res)
+  }
 
   const handleDeleteChecklist = async () => {
     const res = await deleteChecklist(checklistId);
@@ -58,7 +70,7 @@ export default function CheckListMore({checklistId}: CheckListMoreProps) {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`checklist/${checklistId}`);
+      await navigator.clipboard.writeText(`sample`);
       toast({
         title: "Copied!",
         status: 'success',
@@ -79,7 +91,7 @@ export default function CheckListMore({checklistId}: CheckListMoreProps) {
 
   return (
     <div>
-      <Button onClick={onOpen} className="px-2">
+      <Button onClick={handleGenerateShortUrl} className="px-2">
         <FontAwesomeIcon color="white" icon={faEllipsisVertical} />
       </Button>
       <Modal
@@ -95,8 +107,8 @@ export default function CheckListMore({checklistId}: CheckListMoreProps) {
           <ModalBody className="mb-3">
             <p>Share to collaborate! 🔥</p>
             <Box className="flex items-center rounded-md bg-slate-50 p-1">
-              <p className="text-gray-500 w-full px-2">short URL here...</p>
-              <Button primary onClick={handleCopy}>
+              <p className="text-gray-500 w-full px-2 text-sm">{pathname}</p>
+              <Button  primary onClick={handleCopy}>
                 <FontAwesomeIcon icon={faCopy} className="mr-1" />
                 Copy
               </Button>

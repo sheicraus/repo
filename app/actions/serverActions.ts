@@ -98,3 +98,33 @@ export async function deleteChecklist(checklistId: string) {
    
   }
 }
+
+export async function generateShortUrl(url: string) {
+  try {
+    const res = await fetch('https://tini.fyi/api/v1/url/create', {
+      method: 'POST',
+      headers: {
+        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_TINI_TOKEN}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        destination: url,
+      }),
+    });
+
+    if (!res.ok) {
+      // You can handle non-successful HTTP responses here, if needed.
+      throw new Error(`Request failed with status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log(data);
+    return {data};
+  } catch (error) {
+    console.error(error);
+    return {error};
+  }
+}
+
+
+
