@@ -130,7 +130,7 @@ export default function CheckListMore({ checklistId }: CheckListMoreProps) {
             )}
             <p className="mt-4">Or save some space</p>
             <Button
-              className="col-span-full text-red-600 bg-red-100 w-full mx-0"
+              className="col-span-full text-red-600 bg-red-100 w-full mx-0 hover:bg-red-200"
               onClick={handleDeleteChecklist}
             >
               <FontAwesomeIcon icon={faTrash} className="mr-2 text-red-600" />
