@@ -1,12 +1,11 @@
 "use client";
+import React, { useEffect } from "react";
 import {
   faCopy,
   faEllipsisVertical,
-  faShare,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useRef, useState } from "react";
 import Button from "../buttons/Button";
 import {
   Box,
@@ -16,46 +15,29 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Spinner,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { deleteChecklist, generateShortUrl } from "@/app/actions/serverActions";
-import { useRouter, usePathname } from "next/navigation";
-// import { useRouter as useRouterNavigation } from "next/router";
+import { useRouter } from "next/navigation";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 interface CheckListMoreProps {
   checklistId: string;
   shortUrl: string;
 }
 
-export default function CheckListMore({ checklistId }: CheckListMoreProps) {
+export default function CheckListMore({
+  checklistId,
+  shortUrl,
+}: CheckListMoreProps) {
   const toast = useToast();
   const router = useRouter();
-  const pathname = usePathname();
+  const supabase = createClientComponentClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [shortUrl, setShortUrl] = useState<string>("");
-
-  // const handleGenerateShortUrl = async () => {
-  //   setIsLoading(true);
-  //   onOpen();
-  //   const res = await generateShortUrl(
-  //     `${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`
-  //   );
-
-  //   if (res.data) {
-  //     setShortUrl(res.data.data.shortUrl);
-  //   } else {
-  //     // Set the long url when api failed
-  //     setShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`);
-  //   }
-  //   setIsLoading(false);
-  // };
 
   const handleDeleteChecklist = async () => {
     const res = await deleteChecklist(checklistId);
-    console.log("after delete checklist", res);
     if (res.data) {
       toast({
         title: "Successfully deleted checklist!",
@@ -64,6 +46,7 @@ export default function CheckListMore({ checklistId }: CheckListMoreProps) {
         isClosable: true,
         position: "top",
       });
+      onClose();
       setTimeout(() => {
         router.push("/");
       }, 1000);
@@ -88,6 +71,7 @@ export default function CheckListMore({ checklistId }: CheckListMoreProps) {
         isClosable: true,
         position: "top",
       });
+      onClose();
     } catch (err) {
       toast({
         title: "Copy to clipboard failed.",
@@ -99,13 +83,37 @@ export default function CheckListMore({ checklistId }: CheckListMoreProps) {
     }
   };
 
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("*")
+      .on(
+        "postgres_changes",
+        { 
+          event: "DELETE", 
+          schema: "public", 
+          table: "checklists",
+          filter: `id=eq.${checklistId}` // listen only to row-level changes
+        },
+        () => {
+          console.log(`Checklist ID: ${checklistId} has been deleted!`)
+          router.push('/');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, router]);
+
   return (
     <div>
-      {/* <Button onClick={handleGenerateShortUrl} className="px-2"> */}
       <Button onClick={onOpen} className="px-2">
         <FontAwesomeIcon color="white" icon={faEllipsisVertical} />
       </Button>
       <Modal
+        size={`sm`}
         blockScrollOnMount={false}
         isOpen={isOpen}
         onClose={onClose}
@@ -117,19 +125,13 @@ export default function CheckListMore({ checklistId }: CheckListMoreProps) {
           <ModalCloseButton />
           <ModalBody className="mb-3">
             <p>Share to collaborate! 🔥</p>
-            {isLoading ? (
-              <Box className="flex items-center justify-center rounded-md bg-slate-50 p-3">
-                <Spinner color="gray" />
-              </Box>
-            ) : (
-              <Box className="flex items-center rounded-md bg-slate-50 p-1">
-                <p className="text-gray-500 w-full px-2 text-sm">{shortUrl}</p>
-                <Button primary onClick={handleCopy}>
-                  <FontAwesomeIcon icon={faCopy} className="mr-1" />
-                  Copy
-                </Button>
-              </Box>
-            )}
+            <Box className="flex items-center rounded-md bg-slate-50 p-1">
+              <p className="text-gray-500 w-full px-2 text-sm">{shortUrl}</p>
+              <Button primary onClick={handleCopy}>
+                <FontAwesomeIcon icon={faCopy} className="mr-1" />
+                Copy
+              </Button>
+            </Box>
             <p className="mt-4">Or save some space</p>
             <Button
               className="col-span-full text-red-600 bg-red-100 w-full mx-0 hover:bg-red-200"

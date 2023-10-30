@@ -12,7 +12,7 @@ import React, { useEffect, useState } from "react";
 /**
  * Real-time checklist items
  */
-export default function CheckListItems({ items }: CheckListItemsProps) {
+export default function CheckListItems({ checklistId, items }: CheckListItemsProps) {
   const router = useRouter();
   const supabase = createClientComponentClient();
 
@@ -21,11 +21,17 @@ export default function CheckListItems({ items }: CheckListItemsProps) {
       .channel("*")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "checklist_items" },
+        { 
+          event: "*", 
+          schema: "public", 
+          table: "checklist_items", 
+          filter: `checklist_id=eq.${checklistId}`, // listen only to row-level changes
+        },
         () => {
           router.refresh();
         }
       )
+
       .subscribe();
 
     return () => {
@@ -83,7 +89,7 @@ export default function CheckListItems({ items }: CheckListItemsProps) {
             <DeleteIcon
               className="text-gray-400 cursor-pointer mt-1"
               onClick={() => handleDeleteItem(item.id)}
-              fontSize={12}
+              fontSize={18}
             />
           </Tooltip>
         </ListItem>

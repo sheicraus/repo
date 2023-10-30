@@ -9,8 +9,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { addChecklist } from "@/app/actions/serverActions";
-import { useFormStatus } from "react-dom";
+import { addChecklist, generateShortUrl, updateChecklist } from "@/app/actions/serverActions";
 
 export default function CreatelistForm() {
   const toast = useToast();
@@ -34,18 +33,38 @@ export default function CreatelistForm() {
     setIsLoading(true);
     setTitle(""); // reset field
     const res = await addChecklist(title);
+
     if (res.data) {
-      console.log(res.data)
-      toast({
-        title: "Successfully created a checklist!",
-        status: 'success',
-        duration: 2000,
-        isClosable: true,
-        position: 'top',
+      // Generate short URL from third-party link shortener
+      const destination = `${process.env.NEXT_PUBLIC_BASE_URL}/checklist/${res.data[0].id}`
+      const tini = await generateShortUrl(destination);
+
+      // Update checklist with the generated short URL
+      const resUpdate = await updateChecklist({
+        ...res.data[0],
+        short_url: tini.data ? tini.data.data.shortUrl : destination
       })
-      router.push(`/checklist/${res.data[0].id}`);
+
+      if (resUpdate.data) {
+        toast({
+          title: "Successfully created a checklist!",
+          status: 'success',
+          duration: 2000,
+          isClosable: true,
+          position: 'top',
+        })
+        router.push(`/checklist/${res.data[0].id}`);
+      } else {
+        toast({
+          title: "Something went wrong",
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+          position: 'top',
+        })
+      }
+
     } else if (res.error) {
-      console.log(res.error);
       toast({
         title: "Something went wrong",
         status: 'error',
