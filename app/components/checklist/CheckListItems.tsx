@@ -26,7 +26,7 @@ export default function CheckListItems({ checklistId, items }: CheckListItemsPro
           schema: "public", 
           table: "checklist_items", 
           filter: `checklist_id=eq.${checklistId}`, // listen only to row-level changes
-        },
+        },  
         () => {
           router.refresh();
         }
