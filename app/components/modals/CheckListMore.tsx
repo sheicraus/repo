@@ -46,6 +46,7 @@ export default function CheckListMore({
         isClosable: true,
         position: "top",
       });
+      onClose();
       setTimeout(() => {
         router.push("/");
       }, 1000);
@@ -70,6 +71,7 @@ export default function CheckListMore({
         isClosable: true,
         position: "top",
       });
+      onClose();
     } catch (err) {
       toast({
         title: "Copy to clipboard failed.",
@@ -87,8 +89,14 @@ export default function CheckListMore({
       .channel("*")
       .on(
         "postgres_changes",
-        { event: "DELETE", schema: "public", table: "checklists" },
+        { 
+          event: "DELETE", 
+          schema: "public", 
+          table: "checklists",
+          filter: `id=eq.${checklistId}` // listen only to row-level changes
+        },
         () => {
+          console.log(`Checklist ID: ${checklistId} has been deleted!`)
           router.push('/');
         }
       )
@@ -105,6 +113,7 @@ export default function CheckListMore({
         <FontAwesomeIcon color="white" icon={faEllipsisVertical} />
       </Button>
       <Modal
+        size={`sm`}
         blockScrollOnMount={false}
         isOpen={isOpen}
         onClose={onClose}

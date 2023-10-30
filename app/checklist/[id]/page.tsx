@@ -12,9 +12,9 @@ export default async function Checklist({
 }: {
   params: { id: string };
 }) {
-  const res = await getChecklist(id);
+  const res: any = await getChecklist(id);
 
-  if (res.data) {
+  if (res.data.length > 0) {
     return (
       <div className="min-h-screen w-screen bg-primaryBg">
         <div className="px-3 bg-secondary-50 text-white flex flex-row items-center justify-between">
@@ -26,7 +26,7 @@ export default async function Checklist({
           <CheckListMore checklistId={id} shortUrl={res.data[0].short_url}/>
         </div>
         <AddItem checklistId={id} />
-        <CheckListItems items={res.data[0].checklist_items} />
+        <CheckListItems checklistId={id} items={res.data[0].checklist_items} />
       </div>
     );
   } else {
