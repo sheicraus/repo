@@ -83,7 +83,7 @@ export default function CheckListItems({ items }: CheckListItemsProps) {
             <DeleteIcon
               className="text-gray-400 cursor-pointer mt-1"
               onClick={() => handleDeleteItem(item.id)}
-              fontSize={12}
+              fontSize={18}
             />
           </Tooltip>
         </ListItem>
