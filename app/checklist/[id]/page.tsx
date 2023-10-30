@@ -23,7 +23,7 @@ export default async function Checklist({
               {res.data[0].title}
             </h1>
           </div>
-          <CheckListMore checklistId={id} />
+          <CheckListMore checklistId={id} shortUrl={res.data[0].short_url}/>
         </div>
         <AddItem checklistId={id} />
         <CheckListItems items={res.data[0].checklist_items} />

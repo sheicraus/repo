@@ -26,6 +26,7 @@ import { useRouter, usePathname } from "next/navigation";
 
 interface CheckListMoreProps {
   checklistId: string;
+  shortUrl: string;
 }
 
 export default function CheckListMore({ checklistId }: CheckListMoreProps) {
@@ -36,21 +37,21 @@ export default function CheckListMore({ checklistId }: CheckListMoreProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [shortUrl, setShortUrl] = useState<string>("");
 
-  const handleGenerateShortUrl = async () => {
-    setIsLoading(true);
-    onOpen();
-    const res = await generateShortUrl(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`
-    );
+  // const handleGenerateShortUrl = async () => {
+  //   setIsLoading(true);
+  //   onOpen();
+  //   const res = await generateShortUrl(
+  //     `${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`
+  //   );
 
-    if (res.data) {
-      setShortUrl(res.data.data.shortUrl);
-    } else {
-      // Set the long url when api failed
-      setShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`);
-    }
-    setIsLoading(false);
-  };
+  //   if (res.data) {
+  //     setShortUrl(res.data.data.shortUrl);
+  //   } else {
+  //     // Set the long url when api failed
+  //     setShortUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${pathname}`);
+  //   }
+  //   setIsLoading(false);
+  // };
 
   const handleDeleteChecklist = async () => {
     const res = await deleteChecklist(checklistId);
@@ -100,7 +101,8 @@ export default function CheckListMore({ checklistId }: CheckListMoreProps) {
 
   return (
     <div>
-      <Button onClick={handleGenerateShortUrl} className="px-2">
+      {/* <Button onClick={handleGenerateShortUrl} className="px-2"> */}
+      <Button onClick={onOpen} className="px-2">
         <FontAwesomeIcon color="white" icon={faEllipsisVertical} />
       </Button>
       <Modal
