@@ -18,6 +18,7 @@ export interface ChecklistItem {
 }
 
 export interface CheckListItemsProps {
+  checklistId: string;
   items: ChecklistItem[];
 }
 

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   faCopy,
   faEllipsisVertical,
@@ -20,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { deleteChecklist, generateShortUrl } from "@/app/actions/serverActions";
 import { useRouter } from "next/navigation";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 interface CheckListMoreProps {
   checklistId: string;
@@ -32,6 +33,7 @@ export default function CheckListMore({
 }: CheckListMoreProps) {
   const toast = useToast();
   const router = useRouter();
+  const supabase = createClientComponentClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleDeleteChecklist = async () => {
@@ -78,6 +80,24 @@ export default function CheckListMore({
       });
     }
   };
+
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("*")
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "checklists" },
+        () => {
+          router.push('/');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, router]);
 
   return (
     <div>
