@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { supabase } from "../service/supabase";
-import { ChecklistItem } from "../types/types";
+import { Checklist, ChecklistItem } from "../types/types";
 
 export const getChecklist = async (id: string) => {
   try {
@@ -28,6 +28,22 @@ export const addChecklist = async (title: string) => {
         },
       ])
       .select();
+
+    return { data };
+  } catch (error) {
+    return { error };
+  }
+};
+
+export const updateChecklist = async (checklist: Checklist) => {
+  try {
+    const { data, error } = await supabase
+    .from('checklists')
+    .update({
+      ...checklist
+    })
+    .eq('id', checklist.id)
+    .select()
 
     return { data };
   } catch (error) {
